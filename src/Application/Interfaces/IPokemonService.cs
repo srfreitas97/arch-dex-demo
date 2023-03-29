@@ -1,4 +1,9 @@
-public interface IPokemonService
+using Application.Models;
+
+namespace Application.Interfaces
 {
-    Task<PokemonDto> GetPokemon(string name, CancellationToken cancellationToken);
+    public interface IPokemonService
+    {
+        Task<PokemonDto> GetPokemon(string name, CancellationToken cancellationToken);
+    }
 }

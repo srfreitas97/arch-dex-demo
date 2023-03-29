@@ -1,3 +1,8 @@
+using Application.Interfaces;
+using Application.Services;
+using Domain.Interfaces;
+using Infrastructure.Repositories;
+
 internal class Program
 {
     private static void Main(string[] args)

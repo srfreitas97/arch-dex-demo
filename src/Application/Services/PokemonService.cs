@@ -1,39 +1,48 @@
-public class PokemonService : IPokemonService
+using Application.Interfaces;
+using Application.Models;
+using Domain.Entities;
+using Domain.Interfaces;
+using Infrastructure.Repositories;
+
+namespace Application.Services
 {
-    private readonly IPokemonRepository pokemonRepository;
-
-    public PokemonService(IPokemonRepository pokemonRepository)
+    public class PokemonService : IPokemonService
     {
-        this.pokemonRepository = pokemonRepository;
-    }
-    public async Task<PokemonDto> GetPokemon(string name, CancellationToken cancellationToken)
-    {
-        var pokemon = await pokemonRepository.GetPokemon(name, cancellationToken);
+        private readonly IPokemonRepository pokemonRepository;
 
-        return new PokemonDto
+        public PokemonService(IPokemonRepository pokemonRepository)
         {
-            Id = pokemon?.Id,
-            Name = pokemon?.Name,
-            Order = pokemon?.Order,
-            Stats = CreateStatsDictionary(pokemon?.Stats),
-            Types = pokemon?.Types,
-            Weight = pokemon?.Weight
-        };
-    }
-
-    private Dictionary<string, int?>? CreateStatsDictionary(IList<PokemonStat>? statsList)
-    {
-        if(statsList is null || !statsList.Any())
-            return null;
-
-        var statsDictionary = new Dictionary<string, int?>();
-
-        foreach(var stat in statsList)
+            this.pokemonRepository = pokemonRepository;
+        }
+        public async Task<PokemonDto> GetPokemon(string name, CancellationToken cancellationToken)
         {
-            if(stat?.Name is not null)
-                statsDictionary.Add(stat.Name, stat?.BaseStat);
+            var pokemon = await pokemonRepository.GetPokemon(name, cancellationToken);
+
+            return new PokemonDto
+            {
+                Id = pokemon?.Id,
+                Name = pokemon?.Name,
+                Order = pokemon?.Order,
+                Stats = CreateStatsDictionary(pokemon?.Stats),
+                Types = pokemon?.Types,
+                Weight = pokemon?.Weight
+            };
         }
 
-        return statsDictionary;
+        private Dictionary<string, int?>? CreateStatsDictionary(IList<PokemonStat>? statsList)
+        {
+            if (statsList is null || !statsList.Any())
+                return null;
+
+            var statsDictionary = new Dictionary<string, int?>();
+
+            foreach (var stat in statsList)
+            {
+                if (stat?.Name is not null)
+                    statsDictionary.Add(stat.Name, stat?.BaseStat);
+            }
+
+            return statsDictionary;
+        }
     }
 }

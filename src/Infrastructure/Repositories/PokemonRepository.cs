@@ -1,39 +1,45 @@
+using Domain.Entities;
+using Domain.Interfaces;
+using Infrastructure.Models.Responses;
 using Newtonsoft.Json;
 using RestSharp;
 
-public class PokemonRepository : IPokemonRepository
+namespace Infrastructure.Repositories
 {
-    private readonly IRestClient restClient;
-
-    public PokemonRepository()
+    public class PokemonRepository : IPokemonRepository
     {
-        restClient = new RestClient("https://pokeapi.co/api/v2/");
-    }
-    public async Task<Pokemon?> GetPokemon(string name, CancellationToken cancellationToken)
-    {
-        var request = new RestRequest(string.Format("pokemon/{0}", name), Method.Get);
-        var response = await restClient.ExecuteAsync(request);
+        private readonly IRestClient restClient;
 
-        if(!response.IsSuccessful)
+        public PokemonRepository()
         {
-            return null;
+            restClient = new RestClient("https://pokeapi.co/api/v2/");
         }
-
-        var pokemonData = JsonConvert.DeserializeObject<PokemonApiResponse>(response.Content?? "");
-
-        return new Pokemon
+        public async Task<Pokemon?> GetPokemon(string name, CancellationToken cancellationToken)
         {
-            Id = pokemonData?.Id,
-            Name = pokemonData?.Name,
-            Order = pokemonData?.Order,
-            Stats = pokemonData?.Stats?.Select(stat => 
-            new PokemonStat
+            var request = new RestRequest(string.Format("pokemon/{0}", name), Method.Get);
+            var response = await restClient.ExecuteAsync(request);
+
+            if (!response.IsSuccessful)
             {
-                BaseStat = stat.BaseStat,
-                Name = stat?.Stat?.Name
-            }).ToList(),
-            Weight = pokemonData?.Weight,
-            Types = pokemonData?.Types?.Select(type => type?.Type?.Name).ToList()
-        };
+                return null;
+            }
+
+            var pokemonData = JsonConvert.DeserializeObject<PokemonApiResponse>(response.Content ?? "");
+
+            return new Pokemon
+            {
+                Id = pokemonData?.Id,
+                Name = pokemonData?.Name,
+                Order = pokemonData?.Order,
+                Stats = pokemonData?.Stats?.Select(stat =>
+                new PokemonStat
+                {
+                    BaseStat = stat.BaseStat,
+                    Name = stat?.Stat?.Name
+                }).ToList(),
+                Weight = pokemonData?.Weight,
+                Types = pokemonData?.Types?.Select(type => type?.Type?.Name).ToList()
+            };
+        }
     }
 }

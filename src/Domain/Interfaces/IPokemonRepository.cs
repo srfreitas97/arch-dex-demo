@@ -1,4 +1,9 @@
-public interface IPokemonRepository
+using Domain.Entities;
+
+namespace Domain.Interfaces
 {
-    public Task<Pokemon?> GetPokemon(string name, CancellationToken cancellationToken);
+    public interface IPokemonRepository
+    {
+        public Task<Pokemon?> GetPokemon(string name, CancellationToken cancellationToken);
+    }
 }
